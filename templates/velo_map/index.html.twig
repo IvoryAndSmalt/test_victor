@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Carte des V&eacute;lhops{% endblock %}
+
+{% block stylesheets %}
+   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+{% endblock %}
+
+{% block body %}
+
+<main>
+    <div class="container main-container">
+        <div class="map-info-top">
+            <h2 class="map-title">
+              Vélhop, les vélos disponibles région Strasbourg
+            </h2>
+            <div class="map-description">
+                
+            </div>
+        </div>
+        <div class="map-display">
+            <div id="map-velos"></div>
+        </div>
+
+        <div class="map-info-bottom">
+            <p></p>
+        </div>
+    </div>
+</main>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+            integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+            crossorigin=""></script>
+
+    <script>
+
+        async function getVelos() {
+
+            const
+                velosData = await fetch("/velo/velosdata"),
+                mapData = await velosData.json(),
+
+                mymap = L.map('map-velos').setView([48.576670, 7.745156], 11),
+
+                attributionStreeMap = 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' + '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+
+                tileUrl = 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibW9udGVuIiwiYSI6ImNrOHU3cG01NTAxemwzaG80YjZ3cXk1bnMifQ.6XssoMajyBSefC88cuM9aA',
+
+                tiles = L.tileLayer(tileUrl, {
+                    maxZoom: 18,
+                    attribution: attributionStreeMap,
+                    id: 'mapbox/streets-v11',
+                    tileSize: 512,
+                    zoomOffset: -1
+                });
+
+            tiles.addTo(mymap);
+
+            Object.keys(mapData).forEach((key) => {
+                let marker = L.marker([mapData[key].coordonnees[0], mapData[key].coordonnees[1]]).addTo(mymap);
+
+                marker.bindPopup("<b>" + mapData[key].na + "</b><p>Velos disponibles: " + mapData[key].av + "</p><p>Velos totales: " + mapData[key].to + "</p>").openPopup();
+            });
+        }
+
+        getVelos();
+
+    </script>
+{% endblock %}

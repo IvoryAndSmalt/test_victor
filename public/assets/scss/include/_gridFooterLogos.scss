@@ -1,0 +1,23 @@
+//
+//
+//
+
+.footer-logos-container {
+  display: grid;
+
+  // For small (xs) devices: 1 per lines
+  grid-template-rows: 1fr;
+  grid-template-columns: repeat(2, 1fr);
+
+  img {
+    width: 75%;
+
+    // For bigger than small devices auto image size
+    @media only screen and (min-width: $breakpoint-sm) {
+      width: auto;
+    }
+  }
+  // Gap between elements
+  grid-column-gap: 25px;
+  grid-row-gap: 10px;
+}
